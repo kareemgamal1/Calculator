@@ -1,0 +1,88 @@
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  height: 100%;
+}
+.calculator {
+  display: flex;
+  flex-direction: column;
+  width: fit-content;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(240, 238, 237);
+  padding: 50px;
+  border-radius: 20px;
+  outline: 5px double rgba(240, 238, 237);
+  box-shadow: 0px 0px 1px 0px rgba(0, 0, 0, 0.75) inset;
+}
+.calculator .result {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-size: 2.6em;
+  background-color: rgb(163, 165, 164);
+  border-radius: 5px;
+  height: auto;
+  border: 3px solid rgba(0, 0, 0, 0.434);
+  outline: 7px double rgb(215, 216, 211);
+  box-shadow: 0px 0px 2px 1px rgba(0, 0, 0, 0.75) inset,
+    0px 0px 2px 1px rgba(0, 0, 0, 0.75);
+  padding-top: 10px;
+  padding-bottom: 5px;
+  width: 288px;
+  overflow: hidden;
+}
+.calculator .result .lastOperation {
+  color: rgb(47, 46, 46);
+  font-size: 0.5em;
+  margin-bottom: 10px;
+}
+.buttons {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  overflow: hidden;
+  background-color: rgb(240 238 237);
+  margin-top: 35px;
+  border-radius: 10px;
+  border: 1px solid rgb(0, 0, 0);
+}
+.buttons input {
+  padding: 30px 0px;
+  background-color: rgb(196, 194, 194);
+  font-weight: 800;
+  color: white;
+  outline: none;
+  border: 1px solid black;
+}
+.buttons input:hover {
+  background-color: rgb(186, 183, 183);
+}
+.buttons input:active {
+  transform: translateY(0.5px);
+}
+/* footer starts  */
+.footer {
+  display: flex;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  justify-content: center;
+  width: 100%;
+  font-size: 1em;
+}
+.footer p {
+  width: fit-content;
+}
+.fa-github {
+  padding: 3px;
+  color: black;
+  transition: transform 0.3s ease-in-out;
+}
+.fa-github:hover {
+  transform: rotate(360deg) scale(1.2);
+}
+/* footer ends  */
