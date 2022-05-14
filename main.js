@@ -106,59 +106,83 @@ dot.addEventListener("click", () => {
     currentOp.textContent += dot.value;
   }
 });
+sqrt.addEventListener("click", () => {
+  if (result != 0) {
+    currentOp.textContent = Math.sqrt(result).toFixed(2);
+  } else {
+    currentOp.textContent = Math.sqrt(currentOp.textContent).toFixed(2);
+  }
+});
 
-function calculateResult(firstNumb, secondNumb, operation) {
+function calculateResult() {
   if (operation === "-") {
     result = firstNumb - secondNumb;
-  } else if (operation === "+") {
-    result = parseInt(firstNumb) + parseInt(secondNumb);
-  } else if (operation === "÷") {
+  } else if (operation == "+") {
+    result = firstNumb + secondNumb;
+  } else if (operation == "÷") {
     result = firstNumb / secondNumb;
-  } else if (operation === "×") {
-    result = parseInt(firstNumb) * parseInt(secondNumb);
-  } else if (operation === "%") {
+  } else if (operation == "×") {
+    result = firstNumb * secondNumb;
+  } else if (operation == "%") {
     result = firstNumb % secondNumb;
   }
 }
 
-function getResult(firstNumb, secondNumb, operation) {
-  calculateResult(firstNumb, secondNumb, operation);
-  lastOp.textContent = `${firstNumb}${operation}${secondNumb}=${result}`;
-  currentOp.textContent = result;
-  firstNumb = result;
-}
-
-function writePreOp(operation) {
-  currentOp.textContent = "\u00A0";
+function writePreOp() {
   lastOp.textContent = "\u00A0";
   lastOp.textContent = `${firstNumb}${operation}`;
+  currentOp.textContent = "\u00A0";
+}
+
+function writePostOp() {
+  lastOp.textContent = `${firstNumb}${operation}${secondNumb}=${result}`;
+  currentOp.textContent = result;
+}
+
+function getResult() {
+  calculateResult();
+  writePostOp();
 }
 
 function doOperation(element) {
-  if (isOn) {
-    operation = element.value;
-    //lw awl mra ydkhl khales
-    //lw awl mra y3ml equation
-    //b3d kda bmshy 3la nfs el rate, ydos el button, yktb rakm, ynfz operation
-    if (firstOperand) {
-      firstNumb = getCurrentNumber();
-      writePreOp(operation);
-      firstOperand = false;
-    } else {
-      secondNumb = getCurrentNumber();
-      getResult(firstNumb, secondNumb, operation);
-      writePreOp(operation);
-    }
+  operation = element.value;
+  let nbsp = String.fromCharCode(160); //stands for HTML entity &nbsp
+  if (currentOp.textContent == nbsp) {
+    alert("Enter a second number.");
+  } else if (firstOperand) {
+    firstNumb = getCurrentNumber();
+    writePreOp();
+    firstOperand = false;
+  } else if (
+    currentOp.childNodes.length != 0 &&
+    lastOp.childNodes.length != 0 &&
+    operationDone
+  ) {
+    secondNumb = getCurrentNumber();
+    getResult();
+    firstNumb = result;
+    writePreOp();
+  } else if (!operationDone) {
+    firstNumb = getCurrentNumber();
+    writePreOp();
   } else {
-    alert("Please turn the calculator on.");
+    firstNumb = getCurrentNumber();
+    getResult();
+    writePreOp();
   }
+  operationDone = true;
 }
 
 equal.addEventListener("click", () => {
   if (isOn) {
-    if (currentOp.childNodes.length != 0 && lastOp.childNodes.length != 0) {
+    if (
+      currentOp.childNodes.length != 0 &&
+      lastOp.childNodes.length != 0 &&
+      operationDone
+    ) {
       secondNumb = getCurrentNumber();
-      getResult(firstNumb, secondNumb, operation);
+      getResult();
+      operationDone = false; //used to prevent pressing equal multiple times.
     }
   } else {
     alert("Please turn the calculator on.");
@@ -167,11 +191,15 @@ equal.addEventListener("click", () => {
 
 operations.forEach((element) => {
   element.addEventListener("click", () => {
-    doOperation(element);
+    if (isOn) {
+      doOperation(element);
+    } else {
+      alert("Please turn the calculator on.");
+    }
   });
 });
 
 function getCurrentNumber() {
   let s = currentOp.textContent;
-  return parseInt(s.replace(/\s/g, ""));
+  return parseFloat(s.replace(/\s/g, ""));
 }
