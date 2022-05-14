@@ -25,19 +25,27 @@ const clear = document.getElementById("clear");
 const on = document.getElementById("on");
 const lastOp = document.querySelector(".lastOperation");
 const currentOp = document.querySelector(".currentOperation");
-
+let inputButtons = [n0, n00, n1, n2, n3, n4, n5, n6, n7, n8, n9];
+let resetButtons = [clear, on, off];
+let operations = [add, subtract, divide, multiply, remainder];
+let operationDone = false;
+let result = 0;
+let firstNumb = 0;
+let secondNumb = 0;
+let operation;
 let isOn = true;
+let float = true;
+let first = true;
+let firstOperand = true;
+let firstEquation = true;
+let cnt = 0;
 
-function turnOn() {
-  lastOp.textContent = "‏‏‎ ‎";
-  currentOp.textContent = "0";
-  isOn = true;
-}
 function turnOff() {
-  currentOp.textContent = "‏‏‎ ‎";
-  lastOp.textContent = "‏‏‎ ‎";
+  currentOp.textContent = "\u00A0";
+  lastOp.textContent = "\u00A0";
   isOn = false;
 }
+
 function clearAll() {
   if (!isOn) {
     alert("Please turn the calculator on.");
@@ -46,66 +54,124 @@ function clearAll() {
   }
 }
 
-let resetButtons = [clear, on, off];
+function turnOn() {
+  lastOp.textContent = "\u00A0";
+  currentOp.textContent = "0";
+  isOn = first = firstOperand = firstEquation = float = true;
+  operationDone = false;
+  result = firstNumb = secondNumb = cnt = 0;
+}
+
 resetButtons.forEach((element) => {
   element.addEventListener("click", () => {
-    if (element == clear) {
-      clearAll();
-    } else if (element == off) {
-      turnOff();
-    } else if (element == on) {
-      turnOn();
+    switch (element) {
+      case clear: {
+        clearAll();
+        break;
+      }
+      case off: {
+        turnOff();
+        break;
+      }
+      case on: {
+        turnOn();
+        break;
+      }
+      default:
+        break;
     }
   });
 });
 
-let inputButtons = [dot, n0, n00, n1, n2, n3, n4, n5, n6, n7, n8, n9];
 inputButtons.forEach((element) => {
   element.addEventListener("click", () => {
-    if (isOn) {
-      if (currentOp.textContent === "0") {
-        currentOp.textContent = "‏‏‎ ‎";
-        currentOp.textContent += element.value;
-      } else currentOp.textContent += element.value;
+    if (currentOp.textContent.length > 12) {
+      alert("You have reached the maximum number length");
     } else {
-      alert("Please turn the calculator on.");
+      if (isOn) {
+        if (currentOp.textContent === "0") {
+          currentOp.textContent = "\u00A0";
+        }
+        currentOp.textContent += element.value;
+      } else {
+        alert("Please turn the calculator on.");
+      }
     }
   });
 });
+
+dot.addEventListener("click", () => {
+  if (float) {
+    float = false;
+    currentOp.textContent += dot.value;
+  }
+});
+
+function calculateResult(firstNumb, secondNumb, operation) {
+  if (operation === "-") {
+    result = firstNumb - secondNumb;
+  } else if (operation === "+") {
+    result = parseInt(firstNumb) + parseInt(secondNumb);
+  } else if (operation === "÷") {
+    result = firstNumb / secondNumb;
+  } else if (operation === "×") {
+    result = parseInt(firstNumb) * parseInt(secondNumb);
+  } else if (operation === "%") {
+    result = firstNumb % secondNumb;
+  }
+}
+
+function getResult(firstNumb, secondNumb, operation) {
+  calculateResult(firstNumb, secondNumb, operation);
+  lastOp.textContent = `${firstNumb}${operation}${secondNumb}=${result}`;
+  currentOp.textContent = result;
+  firstNumb = result;
+}
+
+function writePreOp(operation) {
+  currentOp.textContent = "\u00A0";
+  lastOp.textContent = "\u00A0";
+  lastOp.textContent = `${firstNumb}${operation}`;
+}
 
 function doOperation(element) {
   if (isOn) {
-    lastOp.textContent = "‏‏‎ ‎";
-    lastOp.textContent += currentOp.textContent;
-    lastOp.textContent += element.value;
-    let a = getPreviousNumber();
-    let b = getCurrentNumber();
-    let o = getPreviousOperation();
-    currentOp.textContent = "‏‏‎ ‎";
-    console.log(a, b, o);
+    operation = element.value;
+    //lw awl mra ydkhl khales
+    //lw awl mra y3ml equation
+    //b3d kda bmshy 3la nfs el rate, ydos el button, yktb rakm, ynfz operation
+    if (firstOperand) {
+      firstNumb = getCurrentNumber();
+      writePreOp(operation);
+      firstOperand = false;
+    } else {
+      secondNumb = getCurrentNumber();
+      getResult(firstNumb, secondNumb, operation);
+      writePreOp(operation);
+    }
   } else {
     alert("Please turn the calculator on.");
   }
 }
 
-let operations = [add, subtract, divide, multiply, remainder];
+equal.addEventListener("click", () => {
+  if (isOn) {
+    if (currentOp.childNodes.length != 0 && lastOp.childNodes.length != 0) {
+      secondNumb = getCurrentNumber();
+      getResult(firstNumb, secondNumb, operation);
+    }
+  } else {
+    alert("Please turn the calculator on.");
+  }
+});
+
 operations.forEach((element) => {
   element.addEventListener("click", () => {
     doOperation(element);
   });
 });
-function addOp(a, b) {
-  return a + b;
-}
+
 function getCurrentNumber() {
   let s = currentOp.textContent;
-  return s;
-}
-function getPreviousNumber() {
-  let s = lastOp.textContent;
-  return s.slice(0, -1);
-}
-function getPreviousOperation() {
-  let s = lastOp.textContent;
-  return s.charAt(s.length - 1);
+  return parseInt(s.replace(/\s/g, ""));
 }
